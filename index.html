@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ADD8E6 0%, #E8DCC8 50%, #C9A876 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        /* Custom animations */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .animate-scale-up {
+            animation: scaleUp 0.6s ease-out;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+        }
+
+        .input-field:hover {
+            transform: scale(1.02);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #a0826d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-container {
+            position: relative;
+            overflow: hidden;
+            padding: 60px 20px;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-image {
+            max-width: 900px;
+            margin: 40px auto 0;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: perspective(1000px) rotateX(5deg);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .result-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .result-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .status-text {
+            transition: color 0.3s ease;
+        }
+
+        .success {
+            color: #16a34a;
+        }
+
+        .warning {
+            color: #ea580c;
+        }
+
+        .danger {
+            color: #dc2626;
+        }
+                /* Custom cursor (static preview) - Black and White Ball */
+                #cursor-dot, #cursor-ring {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        transform: translate3d(-9999px, -9999px, 0);
+                        pointer-events: none;
+                        z-index: 9999;
+                        transition: transform 0.12s linear, width 0.18s ease, height 0.18s ease, box-shadow 0.18s ease;
+                    }
+                    #cursor-dot {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 9999px;
+                        background: radial-gradient(circle at 30% 30%, white 0%, white 35%, black 35%, black 65%, white 65%, white 100%);
+                        box-shadow: 0 0 8px rgba(0,0,0,0.4), inset -1px -1px 3px rgba(0,0,0,0.3);
+                    }
+                    #cursor-ring {
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 9999px;
+                        border: 1.5px solid rgba(0,0,0,0.25);
+                        background: transparent;
+                        transition: transform 0.18s cubic-bezier(.2,.8,.2,1), border-color 0.18s;
+                    }
+                    .cursor-active #cursor-dot {
+                        width: 18px;
+                        height: 18px;
+                        box-shadow: 0 0 12px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.4);
+                    }
+                    .cursor-active #cursor-ring {
+                        transform: scale(1.4);
+                        border-color: rgba(0,0,0,0.5);
+                        background: rgba(255,255,255,0.08);
+                    }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="text-5xl md:text-6xl font-bold animate-slide-in-left mb-4">
+                Master Your <br>
+                <span class="gradient-text">Attendance</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 animate-fade-in-up mb-12">
+                Track, calculate, and optimize your attendance effortlessly
+            </p>
+            <div class="hero-image animate-scale-up">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1400&h=720&fit=crop" alt="Attendance Tracking">
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Calculator Section -->
+    <section class="py-20 px-4 md:px-8 section">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
+                    Attendance Calculator
+                </h2>
+                <p class="text-lg text-slate-600">
+                    Calculate your attendance percentage and track your progress
+                </p>
+            </div>
+
+            <div class="grid-2">
+                <!-- Input Section -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-blue-200 card">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.753 2 16.5S6.5 26.747 12 26.747s10-4.5 10-10.247S17.5 6.253 12 6.253z"></path>
+                        </svg>
+                        Subject Details
+                    </h3>
+
+                    <div class="space-y-5">
+                        <!-- Subject Name -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                Subject Name
+                            </label>
+                            <input
+                                type="text"
+                                id="subjectName"
+                                placeholder="e.g., Mathematics"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- Classes Per Week -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                Classes Per Week
+                            </label>
+                            <input
+                                type="number"
+                                id="classesPerWeek"
+                                placeholder="e.g., 3"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- First Working Day -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                First Working Day
+                            </label>
+                            <input
+                                type="date"
+                                id="firstDay"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- Last Working Day -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                Last Working Day
+                            </label>
+                            <input
+                                type="date"
+                                id="lastDay"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- Classes Attended -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                Classes Attended
+                            </label>
+                            <input
+                                type="number"
+                                id="classesAttended"
+                                placeholder="e.g., 12"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- Total Classes -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-slate-700">
+                                Total Classes
+                            </label>
+                            <input
+                                type="number"
+                                id="totalClasses"
+                                placeholder="e.g., 15"
+                                class="input-field w-full px-4 py-3 rounded-lg border-2 border-blue-300/50 bg-gradient-to-r from-blue-100 to-gray-100 hover:bg-blue-50"
+                            >
+                        </div>
+
+                        <!-- Reset Button -->
+                        <button
+                            onclick="resetForm()"
+                            class="w-full mt-4 px-6 py-3 bg-gradient-to-r from-slate-400 to-slate-500 text-white font-semibold rounded-lg hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="space-y-6">
+                    <!-- Attendance Percentage Card -->
+                    <div class="bg-gradient-to-br from-blue-400 to-cyan-300 rounded-3xl p-8 shadow-xl card result-card">
+                        <div class="result-card-content">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-white">Attendance %</h4>
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <div id="attendancePercentage" class="text-5xl font-bold text-white">
+                                0%
+                            </div>
+                            <p id="attendanceStatus" class="text-white/80 mt-2 text-sm">
+                                Fill in your data
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Days Worked Card -->
+                    <div class="bg-gradient-to-br from-blue-200 to-cyan-100 rounded-3xl p-8 shadow-xl card result-card">
+                        <div class="result-card-content">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-slate-700">Working Days</h4>
+                                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div id="workingDays" class="text-5xl font-bold text-slate-800">
+                                0 days
+                            </div>
+                            <p id="estimatedClasses" class="text-slate-600 mt-2 text-sm">
+                                Set your date range
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Subject Summary Card -->
+                    <div id="summaryCard" class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-blue-200 card hidden">
+                        <h4 class="text-lg font-semibold text-slate-800 mb-4">Summary</h4>
+                        <div class="space-y-3 text-sm text-slate-700">
+                            <div id="subjectLine" class="flex justify-between items-center pb-2 border-b border-blue-200">
+                                <span class="font-medium">Subject:</span>
+                                <span id="subjectValue" class="text-blue-600 font-semibold">-</span>
+                            </div>
+                            <div id="classesWeekLine" class="flex justify-between items-center pb-2 border-b border-blue-200 hidden">
+                                <span class="font-medium">Classes/Week:</span>
+                                <span id="classesWeekValue" class="text-blue-600 font-semibold">-</span>
+                            </div>
+                            <div id="durationLine" class="flex justify-between items-center pb-2 border-b border-blue-200 hidden">
+                                <span class="font-medium">Period Duration:</span>
+                                <span id="durationValue" class="text-blue-600 font-semibold">-</span>
+                            </div>
+                            <div id="currentAttendanceLine" class="flex justify-between items-center hidden">
+                                <span class="font-medium">Current Attendance:</span>
+                                <span id="currentAttendanceValue" class="font-semibold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const inputs = {
+            subjectName: document.getElementById('subjectName'),
+            classesPerWeek: document.getElementById('classesPerWeek'),
+            firstDay: document.getElementById('firstDay'),
+            lastDay: document.getElementById('lastDay'),
+            classesAttended: document.getElementById('classesAttended'),
+            totalClasses: document.getElementById('totalClasses'),
+        };
+
+        const displays = {
+            attendancePercentage: document.getElementById('attendancePercentage'),
+            attendanceStatus: document.getElementById('attendanceStatus'),
+            workingDays: document.getElementById('workingDays'),
+            estimatedClasses: document.getElementById('estimatedClasses'),
+            summaryCard: document.getElementById('summaryCard'),
+        };
+
+        // Add event listeners to all inputs
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('change', updateCalculations);
+            input.addEventListener('input', updateCalculations);
+        });
+
+        function updateCalculations() {
+            const attended = parseFloat(inputs.classesAttended.value) || 0;
+            const total = parseFloat(inputs.totalClasses.value) || 0;
+            const firstDate = inputs.firstDay.value ? new Date(inputs.firstDay.value) : null;
+            const lastDate = inputs.lastDay.value ? new Date(inputs.lastDay.value) : null;
+            const classesPerWeek = parseFloat(inputs.classesPerWeek.value) || 0;
+            const subject = inputs.subjectName.value;
+
+            // Calculate Attendance Percentage
+            if (total > 0) {
+                const percentage = ((attended / total) * 100).toFixed(2);
+                displays.attendancePercentage.textContent = percentage + '%';
+                
+                // Update status
+                if (percentage >= 75) {
+                    displays.attendanceStatus.textContent = 'Great! You\'re on track 🎉';
+                    displays.attendanceStatus.className = 'text-white/80 mt-2 text-sm';
+                } else if (percentage >= 50) {
+                    displays.attendanceStatus.textContent = 'Keep attending more classes';
+                    displays.attendanceStatus.className = 'text-white/80 mt-2 text-sm';
+                } else {
+                    displays.attendanceStatus.textContent = 'You need to attend more classes';
+                    displays.attendanceStatus.className = 'text-white/80 mt-2 text-sm';
+                }
+            } else {
+                displays.attendancePercentage.textContent = '0%';
+                displays.attendanceStatus.textContent = 'Fill in your data';
+            }
+
+            // Calculate Working Days
+            if (firstDate && lastDate) {
+                const diffTime = Math.abs(lastDate.getTime() - firstDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                displays.workingDays.textContent = diffDays + ' days';
+
+                if (classesPerWeek > 0) {
+                    const weeks = diffDays / 7;
+                    const estimatedTotal = Math.round(classesPerWeek * weeks);
+                    displays.estimatedClasses.textContent = `~${estimatedTotal} total classes expected`;
+                }
+            } else {
+                displays.workingDays.textContent = '0 days';
+                displays.estimatedClasses.textContent = 'Set your date range';
+            }
+
+            // Update Summary
+            if (subject) {
+                displays.summaryCard.classList.remove('hidden');
+                document.getElementById('subjectValue').textContent = subject;
+
+                if (classesPerWeek > 0) {
+                    document.getElementById('classesWeekLine').classList.remove('hidden');
+                    document.getElementById('classesWeekValue').textContent = classesPerWeek;
+                }
+
+                if (firstDate && lastDate) {
+                    const diffTime = Math.abs(lastDate.getTime() - firstDate.getTime());
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    document.getElementById('durationLine').classList.remove('hidden');
+                    document.getElementById('durationValue').textContent = diffDays + ' days';
+                }
+
+                if (total > 0) {
+                    const percentage = ((attended / total) * 100).toFixed(2);
+                    document.getElementById('currentAttendanceLine').classList.remove('hidden');
+                    const valueSpan = document.getElementById('currentAttendanceValue');
+                    valueSpan.textContent = percentage + '%';
+                    
+                    if (percentage >= 75) {
+                        valueSpan.className = 'font-semibold success';
+                    } else if (percentage >= 50) {
+                        valueSpan.className = 'font-semibold warning';
+                    } else {
+                        valueSpan.className = 'font-semibold danger';
+                    }
+                }
+            } else {
+                displays.summaryCard.classList.add('hidden');
+            }
+        }
+
+        function resetForm() {
+            Object.values(inputs).forEach(input => {
+                input.value = '';
+            });
+            displays.attendancePercentage.textContent = '0%';
+            displays.attendanceStatus.textContent = 'Fill in your data';
+            displays.workingDays.textContent = '0 days';
+            displays.estimatedClasses.textContent = 'Set your date range';
+            displays.summaryCard.classList.add('hidden');
+        }
+
+        // Initial calculation
+        updateCalculations();
+    </script>
+</body>
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<script>
+    (function() {
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        if(!dot || !ring) return;
+        let mouseX = -9999, mouseY = -9999;
+        let ringX = -9999, ringY = -9999;
+        const lerp = (a,b,n)=> (1-n)*a + n*b;
+
+        document.addEventListener('mousemove', (e)=>{
+            mouseX = e.clientX; mouseY = e.clientY;
+            dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        });
+
+        function animate(){
+            ringX = lerp(ringX, mouseX, 0.15);
+            ringY = lerp(ringY, mouseY, 0.15);
+            ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        const interactives = document.querySelectorAll('a,button,input,textarea,select,label');
+        interactives.forEach(el=>{
+            el.addEventListener('mouseenter', ()=> document.body.classList.add('cursor-active'));
+            el.addEventListener('mouseleave', ()=> document.body.classList.remove('cursor-active'));
+        });
+    })();
+</script>
+</html>

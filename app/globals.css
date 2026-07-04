@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dark {
+  --background: oklch(0 0 0);
+}
+
+:root {
+  --background: #000000;
+  --primary: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-orbitron), 'Segoe UI', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+h1,
+h2 {
+  font-family: var(--font-orbitron), 'Segoe UI', sans-serif;
+}
+
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+input,
+button,
+li {
+  font-family: inherit;
+}
+
+/* Custom animations */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Progress bar helper styles (used by AttendanceCalculator) */
+.progress-track {
+  background: rgba(255,255,255,0.12);
+  border-radius: 9999px;
+}
+.progress-fill {
+  height: 12px;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Custom cursor styles - Black and White Ball */
+#cursor-dot {
+  transform: translate3d(-9999px, -9999px, 0);
+  background: radial-gradient(circle at 30% 30%, white 0%, white 35%, black 35%, black 65%, white 65%, white 100%);
+  box-shadow: 0 0 8px rgba(0,0,0,0.4), inset -1px -1px 3px rgba(0,0,0,0.3);
+}
+
+#cursor-ring {
+  transform: translate3d(-9999px, -9999px, 0);
+  border: 1.5px solid rgba(0,0,0,0.25);
+}
+
+#cursor-dot.cursor-active {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.4);
+}
+
+#cursor-ring.cursor-active-ring {
+  transform: scale(1.4);
+  border-color: rgba(160,130,109,0.8);
+  background: rgba(192,150,118,0.1);
+}
